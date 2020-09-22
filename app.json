@@ -1,7 +1,0 @@
-{
-  "scripts": {
-    "dokku": {
-      "predeploy": "npm run-script build && rm -rf api/public && cp -r build api/public"
-    }
-  }
-}
