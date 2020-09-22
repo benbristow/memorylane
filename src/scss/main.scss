@@ -1,0 +1,12 @@
+@import 'variables';
+
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~rc-slider/assets/index';
+
+body {
+  background: $dark;
+}
+
+h1 {
+  font-family: $font-family-cursive;
+}
