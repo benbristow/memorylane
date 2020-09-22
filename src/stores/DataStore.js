@@ -28,7 +28,7 @@ export class DataStore {
       return;
     }
 
-    axios.get('/api/1.0/all', { params: { year: this.year } })
+    axios.get('/api/GetYear', { params: { year: this.year } })
       .then(response => {
         this.cache[this.year] = response.data.results;
         this.updateFromCache();

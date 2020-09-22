@@ -1,5 +1,4 @@
 import { observable } from 'mobx';
-import axios from 'axios';
 import { soundManager } from 'soundmanager2';
 
 export class PlayStore {
