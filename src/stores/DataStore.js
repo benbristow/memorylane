@@ -30,7 +30,11 @@ export class DataStore {
 
     axios.get('/api/GetYear', { params: { year: this.year } })
       .then(response => {
-        this.cache[this.year] = response.data.results;
+        this.cache[this.year] = {
+          movies: response.data.movies,
+          tracks: response.data.tracks
+        };
+        
         this.updateFromCache();
       });
   }
