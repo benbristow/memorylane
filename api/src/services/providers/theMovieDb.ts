@@ -19,7 +19,7 @@ export class TheMovieDb implements IMoviesProvider {
       id: x.id,
       title: x.title,
       description: x.overview,
-      image: `https://image.tmdb.org/t/p/w500#${x.poster_path}`,
+      image: `https://image.tmdb.org/t/p/w500${x.poster_path}`,
       date: new Date(x.release_date)
     }) as IMovie);
   }
