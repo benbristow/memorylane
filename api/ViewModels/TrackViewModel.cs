@@ -1,4 +1,5 @@
 ﻿using MemoryLane.Api.BusinessModels;
+using Newtonsoft.Json;
 
 namespace MemoryLane.Api.ViewModels
 {
@@ -13,14 +14,19 @@ namespace MemoryLane.Api.ViewModels
             Title = businessModel.Title;
         }
 
+        [JsonProperty]
         public string Artist { get; }
 
+        [JsonProperty]
         public string Id { get; }
 
+        [JsonProperty]
         public string Image { get; }
 
+        [JsonProperty]
         public string Preview { get; }
 
+        [JsonProperty]
         public string Title { get; }
     }
 }

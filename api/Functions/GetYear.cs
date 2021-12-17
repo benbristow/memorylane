@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Net;
 using System.Threading.Tasks;
 using MemoryLane.Api.Services;
 using MemoryLane.Api.ViewModels;
@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.OpenApi.Models;
 
 namespace MemoryLane.Api.Functions
 {
@@ -21,6 +23,10 @@ namespace MemoryLane.Api.Functions
         }
 
         [FunctionName(nameof(GetYear))]
+        [OpenApiOperation(nameof(GetYear))]
+        [OpenApiParameter("year", Type = typeof(int), In = ParameterLocation.Query, Required = true)]
+        [OpenApiResponseWithBody(HttpStatusCode.OK, "application/json", typeof(YearViewModel))]
+        [OpenApiResponseWithoutBody(HttpStatusCode.BadRequest)]
         public async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
             HttpRequest req)

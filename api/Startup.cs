@@ -13,7 +13,6 @@ namespace MemoryLane.Api
         {
             builder.Services.AddTransient<IMovieService, MovieService>();
             builder.Services.AddTransient<ITrackService, TrackService>();
-
             builder.Services.AddTransient<IYearService, YearService>();
         }
     }
