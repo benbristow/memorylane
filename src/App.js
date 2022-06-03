@@ -20,9 +20,9 @@ class App extends Component {
             <div className="p-2">
               <a
                 className="text-white"
-                href="https://www.benbristow.co.uk/portfolio_items/memorylane.html"
+                href="https://ben.bristow.me/portfolio_items/memorylane.html"
               >
-                &larr; Back to benbristow.co.uk
+                &larr; Back to ben.bristow.me
               </a>{" "}
             </div>
           </div>
