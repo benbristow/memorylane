@@ -5,15 +5,14 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: FunctionsStartup(typeof(Startup))]
-namespace MemoryLane.Api
+namespace MemoryLane.Api;
+
+public class Startup : FunctionsStartup
 {
-    public class Startup : FunctionsStartup
+    public override void Configure(IFunctionsHostBuilder builder)
     {
-        public override void Configure(IFunctionsHostBuilder builder)
-        {
-            builder.Services.AddTransient<IMovieService, MovieService>();
-            builder.Services.AddTransient<ITrackService, TrackService>();
-            builder.Services.AddTransient<IYearService, YearService>();
-        }
+        builder.Services.AddTransient<IMovieService, MovieService>();
+        builder.Services.AddTransient<ITrackService, TrackService>();
+        builder.Services.AddTransient<IYearService, YearService>();
     }
 }

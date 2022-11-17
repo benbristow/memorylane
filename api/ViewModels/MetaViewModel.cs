@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace MemoryLane.Api.ViewModels
+namespace MemoryLane.Api.ViewModels;
+
+public class MetaViewModel
 {
-    public class MetaViewModel
-    {
-        [JsonProperty]
-        public CriteriaViewModel Criteria { get; init; }
-    }
+    [JsonProperty]
+    public CriteriaViewModel Criteria { get; init; }
 }
