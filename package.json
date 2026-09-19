@@ -2,38 +2,31 @@
   "name": "memorylane",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@babel/plugin-proposal-decorators": "^7.3.0",
-    "@babel/polyfill": "^7.0.0",
-    "axios": "^0.18.0",
-    "bootstrap": "^4.2.1",
-    "customize-cra": "^0.2.11",
-    "http-proxy-middleware": "^0.19.0",
-    "mobx": "^5.9.0",
-    "mobx-react": "^5.4.3",
-    "node-sass": "^4.10.0",
-    "prop-types": "^15.6.2",
-    "rc-slider": "^8.6.4",
-    "react": "^16.6.3",
-    "react-app-rewired": "^2.0.3",
-    "react-dom": "^16.6.3",
-    "react-scripts": "^2.1.3",
-    "react-spinners": "^0.5.1",
+    "axios": "^1.7.9",
+    "bootstrap": "^4.6.2",
+    "mobx": "^6.13.5",
+    "mobx-react-lite": "^4.1.0",
+    "rc-slider": "^11.1.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-spinners": "^0.15.0",
     "soundmanager2": "^2.97.20170602"
   },
-  "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@types/soundmanager2": "^2.97.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "sass": "^1.83.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
 }

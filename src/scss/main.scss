@@ -1,7 +1,7 @@
 @import 'variables';
 
-@import '~bootstrap/scss/bootstrap.scss';
-@import '~rc-slider/assets/index';
+@import 'bootstrap/scss/bootstrap.scss';
+@import 'rc-slider/assets/index.css';
 
 body {
   background: $dark;
@@ -9,4 +9,78 @@ body {
 
 h1 {
   font-family: $font-family-cursive;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-card {
+  background-color: #2b3035;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1rem;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.12) 37%,
+    rgba(255, 255, 255, 0.04) 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite ease-in-out;
+}
+
+.skeleton-image {
+  width: 100%;
+  padding-top: 100%;
+  position: relative;
+}
+
+.skeleton-image-movie {
+  width: 100%;
+  padding-top: 150%;
+  position: relative;
+}
+
+.skeleton-body {
+  padding: 1rem;
+}
+
+.skeleton-title {
+  height: 1.1rem;
+  border-radius: 4px;
+  width: 75%;
+  margin-bottom: 0.6rem;
+}
+
+.skeleton-subtitle {
+  height: 0.85rem;
+  border-radius: 4px;
+  width: 50%;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-button {
+  height: 1.8rem;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #adb5bd;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
 }

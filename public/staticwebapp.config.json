@@ -8,6 +8,12 @@
       }
     },
     {
+      "route": "/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
       "route": "/static/*",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
@@ -30,5 +36,8 @@
   },
   "mimeTypes": {
     ".json": "text/json"
+  },
+  "platform": {
+    "apiRuntime": "dotnet-isolated"
   }
 }
