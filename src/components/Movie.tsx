@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Movie as MovieType } from '../types';
 
 interface MovieProps {
   data: MovieType;
 }
 
+const MOVIE_PLACEHOLDER =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600"><rect width="400" height="600" fill="%231a1e21"/><g opacity="0.25" transform="translate(140,230)"><rect x="0" y="0" width="120" height="90" rx="6" fill="%23aaa"/><circle cx="22" cy="22" r="10" fill="%231a1e21"/><circle cx="98" cy="22" r="10" fill="%231a1e21"/><circle cx="22" cy="68" r="10" fill="%231a1e21"/><circle cx="98" cy="68" r="10" fill="%231a1e21"/><rect x="40" y="30" width="40" height="30" rx="3" fill="%231a1e21"/></g><text x="200" y="360" text-anchor="middle" font-family="sans-serif" font-size="13" fill="%23666">No image available</text></svg>';
+
 const Movie: React.FC<MovieProps> = ({ data }) => {
   const tmdbUrl = `https://www.themoviedb.org/movie/${data.id}`;
   const releaseYear = data.date ? new Date(data.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : '';
+  const [imgSrc, setImgSrc] = useState(data.image || MOVIE_PLACEHOLDER);
 
   return (
     <div className="col-xl-3 col-lg-6 mb-3 d-flex">
@@ -18,7 +22,13 @@ const Movie: React.FC<MovieProps> = ({ data }) => {
           rel="noopener noreferrer"
           className="media-card-img-wrapper movie-img-wrapper text-decoration-none"
         >
-          <img src={data.image} className="card-img-top" alt={data.title} loading="lazy" />
+          <img
+            src={imgSrc}
+            className="card-img-top"
+            alt={data.title}
+            loading="lazy"
+            onError={() => setImgSrc(MOVIE_PLACEHOLDER)}
+          />
         </a>
         <div className="card-body d-flex flex-column">
           <h5 className="card-title text-truncate-2" title={data.title}>
