@@ -28,13 +28,13 @@ const Header: React.FC<HeaderProps> = observer(({ store }) => {
               )}
             </div>
             <div className="now-playing-info text-start min-w-0 flex-grow-1">
-              <div className="now-playing-header-line">
-                <span className="now-playing-badge">PLAYING</span>
-                <span className="now-playing-title text-truncate text-white" title={activeTrack.title}>
+              <div className="now-playing-title-row d-flex align-items-center gap-2">
+                <span className="now-playing-title text-truncate text-white fw-semibold" title={activeTrack.title}>
                   {activeTrack.title}
                 </span>
+                <span className="now-playing-badge flex-shrink-0">PLAYING</span>
               </div>
-              <div className="now-playing-artist text-truncate" title={activeTrack.artist}>
+              <div className="now-playing-artist text-truncate text-muted" title={activeTrack.artist}>
                 {activeTrack.artist}
               </div>
             </div>
