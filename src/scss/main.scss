@@ -12,39 +12,115 @@ h1 {
 }
 
 .now-playing-banner {
-  max-width: 580px;
-  background: rgba(43, 48, 53, 0.85);
+  max-width: 540px;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  background: rgba(33, 37, 41, 0.94);
   border: 1px solid rgba(76, 157, 213, 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
   animation: banner-slide-down 0.3s ease-out;
 
-  .now-playing-img {
+  .now-playing-art-wrapper {
     width: 44px;
     height: 44px;
-    object-fit: cover;
+    margin-right: 0.75rem;
+    border-radius: 0.35rem;
+
+    .now-playing-img {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 0.35rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: block;
+    }
   }
 
-  .now-playing-btn {
-    min-width: 38px;
-    height: 32px;
+  .now-playing-info {
+    min-width: 0;
+    margin-right: 0.75rem;
+
+    .now-playing-header-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      line-height: 1.2;
+      margin-bottom: 0.2rem;
+    }
+
+    .now-playing-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #28a745;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .now-playing-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      line-height: 1.2;
+    }
+
+    .now-playing-artist {
+      font-size: 0.8rem;
+      color: #adb5bd;
+      line-height: 1.2;
+    }
+  }
+
+  .now-playing-actions {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: bold;
-    padding: 0 0.5rem;
+    gap: 0.5rem; /* clean balanced gap between pause and stop */
+
+    .now-playing-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      border-radius: 50%;
+      border-width: 1.5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+      transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+
+      &.now-playing-play-btn {
+        padding-left: 1px; /* visual center for play arrow */
+      }
+
+      &.now-playing-stop-btn {
+        font-size: 0.7rem;
+      }
+
+      &:hover {
+        transform: scale(1.08);
+      }
+    }
   }
 
   .now-playing-pulse-indicator {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 8px;
-    height: 8px;
+    top: -3px;
+    right: -3px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background-color: #28a745;
+    border: 1.5px solid #212529;
     box-shadow: 0 0 8px #28a745;
     animation: pulse-dot 1.2s infinite ease-in-out;
   }

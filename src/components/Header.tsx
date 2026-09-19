@@ -15,41 +15,43 @@ const Header: React.FC<HeaderProps> = observer(({ store }) => {
       <h1 className="mb-2">Memory Lane - {store.year}</h1>
 
       {playStore.trackId && activeTrack && (
-        <div className="now-playing-banner mx-auto d-flex align-items-center justify-content-between p-2 px-3 rounded shadow">
-          <div className="d-flex align-items-center overflow-hidden me-3">
-            <div className="now-playing-art-wrapper me-2 position-relative flex-shrink-0">
+        <div className="now-playing-banner mx-auto d-flex align-items-center justify-content-between shadow">
+          <div className="d-flex align-items-center overflow-hidden min-w-0 flex-grow-1">
+            <div className="now-playing-art-wrapper position-relative flex-shrink-0">
               <img
                 src={activeTrack.image}
                 alt={activeTrack.title}
-                className="rounded now-playing-img"
+                className="now-playing-img"
               />
               {playStore.playing && (
                 <div className="now-playing-pulse-indicator" />
               )}
             </div>
-            <div className="text-start text-truncate">
-              <div className="text-white fw-bold small text-truncate d-flex align-items-center gap-1">
-                <span className="badge bg-success small py-0 px-1">PLAYING</span>
-                <span title={activeTrack.title}>{activeTrack.title}</span>
+            <div className="now-playing-info text-start min-w-0 flex-grow-1">
+              <div className="now-playing-header-line">
+                <span className="now-playing-badge">PLAYING</span>
+                <span className="now-playing-title text-truncate text-white" title={activeTrack.title}>
+                  {activeTrack.title}
+                </span>
               </div>
-              <div className="text-muted small text-truncate" title={activeTrack.artist}>
+              <div className="now-playing-artist text-truncate" title={activeTrack.artist}>
                 {activeTrack.artist}
               </div>
             </div>
           </div>
 
-          <div className="d-flex align-items-center gap-2 flex-shrink-0">
+          <div className="now-playing-actions d-flex align-items-center flex-shrink-0">
             <button
               type="button"
-              className={`btn btn-sm ${playStore.playing ? 'btn-outline-warning' : 'btn-success'} now-playing-btn`}
+              className={`btn btn-sm ${playStore.playing ? 'btn-warning text-dark' : 'btn-primary'} now-playing-btn now-playing-play-btn`}
               onClick={playStore.togglePause}
               title={playStore.playing ? 'Pause' : 'Play'}
             >
-              {playStore.playing ? '❚❚' : '►'}
+              {playStore.playing ? '❚❚' : '▶'}
             </button>
             <button
               type="button"
-              className="btn btn-sm btn-outline-danger now-playing-btn"
+              className="btn btn-sm btn-outline-danger now-playing-btn now-playing-stop-btn"
               onClick={playStore.stopSong}
               title="Stop"
             >
