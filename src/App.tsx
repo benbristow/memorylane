@@ -37,21 +37,14 @@ const App: React.FC = observer(() => {
           </div>
         </div>
 
-        <section className="media-section mb-5">
-          <div className="d-flex align-items-center mb-3 pb-2 border-bottom border-secondary">
-            <h2 className="h4 text-light mb-0">Popular Songs</h2>
-            <span className="badge bg-primary ms-2">Tracks</span>
+        <div className="row">
+          <div className="col-lg-6 mb-4">
+            <MediaGrid store={store} category="tracks" />
           </div>
-          <MediaGrid store={store} category="tracks" />
-        </section>
-
-        <section className="media-section mb-5">
-          <div className="d-flex align-items-center mb-3 pb-2 border-bottom border-secondary">
-            <h2 className="h4 text-light mb-0">Hit Movies</h2>
-            <span className="badge bg-primary ms-2">Cinema</span>
+          <div className="col-lg-6 mb-4">
+            <MediaGrid store={store} category="movies" />
           </div>
-          <MediaGrid store={store} category="movies" />
-        </section>
+        </div>
       </main>
     </div>
   );

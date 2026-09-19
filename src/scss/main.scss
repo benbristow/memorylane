@@ -179,12 +179,16 @@ h1 {
   height: 0;
   opacity: 0;
   margin-bottom: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  background: rgba(43, 48, 53, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: height 0.25s ease, opacity 0.25s ease, margin-bottom 0.25s ease;
 
   &.is-loading {
-    height: 42px;
+    height: 48px;
     opacity: 1;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
   }
 
   .joint-loader-progress {
@@ -194,16 +198,16 @@ h1 {
     right: 0;
     height: 3px;
     background: rgba(76, 157, 213, 0.15);
-    border-radius: 2px;
     overflow: hidden;
 
     &::after {
       content: '';
       position: absolute;
-      background: linear-gradient(90deg, #4C9DD5, #80d4ff);
+      background: linear-gradient(90deg, #4C9DD5, #80d4ff, #4C9DD5);
       top: 0;
       left: 0;
       bottom: 0;
+      box-shadow: 0 0 10px rgba(76, 157, 213, 0.8);
       will-change: left, right;
       animation: indeterminate-bar 1.6s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
     }
@@ -213,8 +217,9 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding-top: 12px;
+    gap: 0.85rem;
+    height: 100%;
+    padding-top: 3px;
 
     .joint-loader-text {
       color: #90caf9;
@@ -225,11 +230,3 @@ h1 {
   }
 }
 
-.media-section {
-  .badge {
-    font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-}

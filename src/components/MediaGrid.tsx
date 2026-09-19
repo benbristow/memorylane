@@ -11,13 +11,13 @@ interface MediaGridProps {
 
 const MediaGrid: React.FC<MediaGridProps> = observer(({ store, category }) => {
   if (store.loading) {
-    const skeletonItems = Array.from({ length: 6 });
+    const skeletonItems = Array.from({ length: 4 });
     const isTracks = category === 'tracks';
 
     return (
       <div className="row">
         {skeletonItems.map((_, index) => (
-          <div key={index} className="col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-3 d-flex">
+          <div key={index} className="col-xl-3 col-lg-6 mb-3 d-flex">
             <div className="skeleton-card media-card h-100 w-100 d-flex flex-column">
               <div className={`skeleton-shimmer ${isTracks ? 'skeleton-image' : 'skeleton-image-movie'}`} />
               <div className="skeleton-body d-flex flex-column flex-grow-1">
