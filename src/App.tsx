@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react';
+import { observer } from 'mobx-react-lite';
+import { PulseLoader } from 'react-spinners';
 import DataStore from './stores/DataStore';
 import Header from './components/Header';
 import YearSlider from './components/YearSlider';
 import MediaGrid from './components/MediaGrid';
 
-const App: React.FC = () => {
+const App: React.FC = observer(() => {
   const store = useMemo(() => new DataStore(), []);
 
   return (
@@ -26,6 +28,13 @@ const App: React.FC = () => {
         <Header store={store} />
         <YearSlider store={store} />
 
+        {store.loading && (
+          <div className="loading-indicator mb-3">
+            <PulseLoader color={'#4C9DD5'} size={8} loading />
+            <span>Loading movies and music for {store.year}...</span>
+          </div>
+        )}
+
         <div className="row">
           <div className="col-lg-6">
             <MediaGrid store={store} category="tracks" />
@@ -37,6 +46,6 @@ const App: React.FC = () => {
       </main>
     </div>
   );
-};
+});
 
 export default App;

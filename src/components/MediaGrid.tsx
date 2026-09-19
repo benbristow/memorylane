@@ -1,6 +1,5 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { PulseLoader } from 'react-spinners';
 import SpotifyTrack from './SpotifyTrack';
 import Movie from './Movie';
 import DataStore from '../stores/DataStore';
@@ -16,25 +15,19 @@ const MediaGrid: React.FC<MediaGridProps> = observer(({ store, category }) => {
     const isTracks = category === 'tracks';
 
     return (
-      <div>
-        <div className="loading-indicator">
-          <PulseLoader color={'#4C9DD5'} size={8} loading />
-          <span>Loading {category}...</span>
-        </div>
-        <div className="row">
-          {skeletonItems.map((_, index) => (
-            <div key={index} className="col-xl-3 col-lg-6 mb-3">
-              <div className="skeleton-card">
-                <div className={`skeleton-shimmer ${isTracks ? 'skeleton-image' : 'skeleton-image-movie'}`} />
-                <div className="skeleton-body">
-                  <div className="skeleton-title skeleton-shimmer" />
-                  {isTracks && <div className="skeleton-subtitle skeleton-shimmer" />}
-                  {isTracks && <div className="skeleton-button skeleton-shimmer" />}
-                </div>
+      <div className="row">
+        {skeletonItems.map((_, index) => (
+          <div key={index} className="col-xl-3 col-lg-6 mb-3">
+            <div className="skeleton-card">
+              <div className={`skeleton-shimmer ${isTracks ? 'skeleton-image' : 'skeleton-image-movie'}`} />
+              <div className="skeleton-body">
+                <div className="skeleton-title skeleton-shimmer" />
+                {isTracks && <div className="skeleton-subtitle skeleton-shimmer" />}
+                {isTracks && <div className="skeleton-button skeleton-shimmer" />}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     );
   }
