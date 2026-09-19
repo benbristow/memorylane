@@ -25,6 +25,19 @@ public class TrackService : ITrackService
     {
         try
         {
+            int currentYear = DateTime.UtcNow.Year;
+
+            // For the current year, use the official Apple Music Top Songs chart feeds (GB & US)
+            // This provides real, authentic charting hits rather than unranked keyword search matches.
+            if (year >= currentYear)
+            {
+                var chartTracks = await GetCurrentYearChartTracks(year);
+                if (chartTracks.Any())
+                {
+                    return chartTracks;
+                }
+            }
+
             string yearString = year.ToString();
 
             var hitsTask = HttpClient.GetStringAsync(
@@ -109,6 +122,113 @@ public class TrackService : ITrackService
         catch (Exception)
         {
             return Enumerable.Empty<TrackBusinessModel>();
+        }
+    }
+
+    private async Task<List<TrackBusinessModel>> GetCurrentYearChartTracks(int year)
+    {
+        try
+        {
+            var gbTask = HttpClient.GetStringAsync("gb/rss/topsongs/limit=100/json");
+            var usTask = HttpClient.GetStringAsync("us/rss/topsongs/limit=100/json");
+
+            await Task.WhenAll(gbTask, usTask);
+
+            var rawEntries = new List<Newtonsoft.Json.Linq.JToken>();
+            foreach (var task in new[] { gbTask, usTask })
+            {
+                var json = await task;
+                var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
+                var entries = obj["feed"]?["entry"] as Newtonsoft.Json.Linq.JArray;
+                if (entries != null)
+                {
+                    rawEntries.AddRange(entries);
+                }
+            }
+
+            var junkKeywords = new[]
+            {
+                "bgm", "cafe", "cafes", "cover", "karaoke", "tribute",
+                "relaxing", "lo-fi", "lofi", "instrumental", "lullaby",
+                "workout", "meditation", "sleep", "ballermann", "schützenfest", "remake"
+            };
+
+            var parsed = new List<(TrackBusinessModel track, string releaseDate)>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var entry in rawEntries)
+            {
+                var title = entry["im:name"]?["label"]?.ToString();
+                var artist = entry["im:artist"]?["label"]?.ToString();
+                var id = entry["id"]?["attributes"]?["im:id"]?.ToString() ?? string.Empty;
+                var releaseDate = entry["im:releaseDate"]?["label"]?.ToString() ?? string.Empty;
+
+                var images = entry["im:image"] as Newtonsoft.Json.Linq.JArray;
+                var image = images?.LastOrDefault()?["label"]?.ToString() ?? string.Empty;
+                if (!string.IsNullOrEmpty(image))
+                {
+                    image = System.Text.RegularExpressions.Regex.Replace(image, @"/\d+x\d+bb", "/600x600bb");
+                }
+
+                string preview = string.Empty;
+                var links = entry["link"] as Newtonsoft.Json.Linq.JArray;
+                if (links != null)
+                {
+                    var previewLink = links.FirstOrDefault(l =>
+                        l?["attributes"]?["rel"]?.ToString() == "enclosure" ||
+                        l?["im:assetType"]?.ToString() == "preview");
+                    preview = previewLink?["attributes"]?["href"]?.ToString() ?? string.Empty;
+                }
+                else if (entry["link"] != null)
+                {
+                    var l = entry["link"];
+                    if (l?["attributes"]?["rel"]?.ToString() == "enclosure" ||
+                        l?["im:assetType"]?.ToString() == "preview")
+                    {
+                        preview = l?["attributes"]?["href"]?.ToString() ?? string.Empty;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(artist) ||
+                    string.IsNullOrEmpty(preview) || string.IsNullOrEmpty(image))
+                {
+                    continue;
+                }
+
+                if (junkKeywords.Any(k =>
+                    artist.Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                    title.Contains(k, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                var key = $"{artist.Trim()}|{title.Trim()}";
+                if (!seen.Add(key))
+                {
+                    continue;
+                }
+
+                parsed.Add((new TrackBusinessModel
+                {
+                    Artist = artist,
+                    Id = id,
+                    Image = image,
+                    Preview = preview,
+                    Title = title
+                }, releaseDate));
+            }
+
+            string yearString = year.ToString();
+
+            // Order so songs specifically released in the current year appear first, followed by top chart hits
+            return parsed
+                .OrderByDescending(p => p.releaseDate.StartsWith(yearString) ? 1 : 0)
+                .Select(p => p.track)
+                .ToList();
+        }
+        catch (Exception)
+        {
+            return new List<TrackBusinessModel>();
         }
     }
 }

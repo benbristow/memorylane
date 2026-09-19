@@ -76,29 +76,100 @@ function localApiDevPlugin(): Plugin {
               .then((r) => r.data?.results || [])
               .catch(() => []);
 
-          const tracksPromise = Promise.all([
-            fetchTracks(`${year} hits`),
-            fetchTracks(year.toString()),
-            fetchTracks(`top hits ${year}`),
-            fetchTracks(`${year} album`)
-          ]).then(([r1, r2, r3, r4]) => {
-            const junkKeywords = [
-              'bgm', 'cafe', 'cafes', 'cover', 'karaoke', 'tribute',
-              'relaxing', 'lo-fi', 'lofi', 'instrumental', 'lullaby',
-              'workout', 'meditation', 'sleep', 'ballermann', 'schützenfest', 'remake'
+          const currentYear = new Date().getFullYear();
+
+          const junkKeywords = [
+            'bgm', 'cafe', 'cafes', 'cover', 'karaoke', 'tribute',
+            'relaxing', 'lo-fi', 'lofi', 'instrumental', 'lullaby',
+            'workout', 'meditation', 'sleep', 'ballermann', 'schützenfest', 'remake'
+          ];
+
+          const isJunk = (artist: string, title: string, collection = '') => {
+            const a = (artist || '').toLowerCase();
+            const t = (title || '').toLowerCase();
+            const c = (collection || '').toLowerCase();
+            return junkKeywords.some((k) => a.includes(k) || t.includes(k) || c.includes(k));
+          };
+
+          const fetchChartTracks = async () => {
+            const [gbRes, usRes] = await Promise.all([
+              axios.get('https://itunes.apple.com/gb/rss/topsongs/limit=100/json').catch(() => null),
+              axios.get('https://itunes.apple.com/us/rss/topsongs/limit=100/json').catch(() => null)
+            ]);
+
+            const rawEntries = [
+              ...(gbRes?.data?.feed?.entry || []),
+              ...(usRes?.data?.feed?.entry || [])
             ];
 
-            const isJunk = (t: any) => {
-              const artist = (t.artistName || '').toLowerCase();
-              const title = (t.trackName || '').toLowerCase();
-              const collection = (t.collectionName || '').toLowerCase();
-              return junkKeywords.some(
-                (k) => artist.includes(k) || title.includes(k) || collection.includes(k)
+            const parsed: Array<{ track: any; releaseDate: string }> = [];
+            const seen = new Set<string>();
+
+            for (const entry of rawEntries) {
+              const title = entry['im:name']?.label || '';
+              const artist = entry['im:artist']?.label || '';
+              const id = entry['id']?.attributes?.['im:id'] || '';
+              const releaseDate = entry['im:releaseDate']?.label || '';
+
+              const images = entry['im:image'] || [];
+              const rawImage = images.length ? images[images.length - 1].label : '';
+              const image = rawImage.replace(/\/\d+x\d+bb/, '/600x600bb');
+
+              const links = Array.isArray(entry['link']) ? entry['link'] : [entry['link']];
+              const previewLink = links.find(
+                (l: any) => l?.attributes?.rel === 'enclosure' || l?.['im:assetType'] === 'preview'
               );
-            };
+              const preview = previewLink?.attributes?.href || '';
+
+              if (!title || !artist || !preview || !image) continue;
+              if (isJunk(artist, title)) continue;
+
+              const key = `${artist.trim().toLowerCase()}|${title.trim().toLowerCase()}`;
+              if (seen.has(key)) continue;
+              seen.add(key);
+
+              parsed.push({
+                track: {
+                  artist,
+                  id,
+                  image,
+                  preview,
+                  title
+                },
+                releaseDate
+              });
+            }
+
+            const yearStr = year.toString();
+            parsed.sort((a, b) => {
+              const aCurrent = a.releaseDate.startsWith(yearStr) ? 1 : 0;
+              const bCurrent = b.releaseDate.startsWith(yearStr) ? 1 : 0;
+              return bCurrent - aCurrent;
+            });
+
+            return parsed.map((p) => p.track);
+          };
+
+          const tracksPromise = (async () => {
+            if (year >= currentYear) {
+              const chartTracks = await fetchChartTracks();
+              if (chartTracks.length > 0) {
+                return chartTracks;
+              }
+            }
+
+            const [r1, r2, r3, r4] = await Promise.all([
+              fetchTracks(`${year} hits`),
+              fetchTracks(year.toString()),
+              fetchTracks(`top hits ${year}`),
+              fetchTracks(`${year} album`)
+            ]);
 
             const rawTracks = [...r1, ...r2, ...r3, ...r4].filter(
-              (t: any) => t.previewUrl && t.artworkUrl100 && !isJunk(t)
+              (t: any) =>
+                t.previewUrl &&
+                t.artworkUrl100 &&
+                !isJunk(t.artistName, t.trackName, t.collectionName)
             );
             const yearStr = year.toString();
 
@@ -140,7 +211,7 @@ function localApiDevPlugin(): Plugin {
               preview: t.previewUrl || '',
               title: t.trackName || ''
             }));
-          });
+          })();
 
           const [movies, tracks] = await Promise.all([moviesPromise, tracksPromise]);
           const limitedTracks = movies.length > 0 ? tracks.slice(0, movies.length) : tracks;
