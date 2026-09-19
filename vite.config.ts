@@ -63,53 +63,68 @@ function localApiDevPlugin(): Plugin {
             .catch(() => []);
 
           // 2. Fetch tracks from iTunes Search API
-          const tracksPromise = axios
-            .get(`https://itunes.apple.com/search`, {
-              params: {
-                term: year,
-                entity: 'song',
-                limit: 200,
-                country: 'gb'
-              }
-            })
-            .then((r) => {
-              const rawTracks = (r.data?.results || []).filter(
-                (t: any) => t.previewUrl && t.artworkUrl100
-              );
-              const yearStr = year.toString();
+          const fetchTracks = (term: string) =>
+            axios
+              .get(`https://itunes.apple.com/search`, {
+                params: {
+                  term,
+                  entity: 'song',
+                  limit: 200,
+                  country: 'gb'
+                }
+              })
+              .then((r) => r.data?.results || [])
+              .catch(() => []);
 
-              const exact = rawTracks.filter(
-                (t: any) => t.releaseDate && t.releaseDate.startsWith(yearStr)
-              );
-              const albumMatch = rawTracks.filter(
-                (t: any) =>
-                  !exact.includes(t) &&
-                  t.collectionName &&
-                  t.collectionName.includes(yearStr)
-              );
+          const tracksPromise = Promise.all([
+            fetchTracks(`${year} hits`),
+            fetchTracks(year.toString()),
+            fetchTracks(`top hits ${year}`)
+          ]).then(([r1, r2, r3]) => {
+            const rawTracks = [...r1, ...r2, ...r3].filter(
+              (t: any) => t.previewUrl && t.artworkUrl100
+            );
+            const yearStr = year.toString();
 
-              let combined = [...exact, ...albumMatch];
-              if (!combined.length) {
-                combined = rawTracks.slice(0, 20);
-              }
+            // Strictly filter to tracks released in that year
+            const exact = rawTracks.filter(
+              (t: any) => t.releaseDate && t.releaseDate.startsWith(yearStr)
+            );
 
-              // Deduplicate
-              const seen = new Set();
-              const unique = combined.filter((t: any) => {
-                if (seen.has(t.trackId)) return false;
-                seen.add(t.trackId);
-                return true;
-              });
+            // Deduplicate by artist and track name
+            const seen = new Set();
+            let finalTracks = exact.filter((t: any) => {
+              const key = `${t.artistName?.trim().toLowerCase()}|${t.trackName?.trim().toLowerCase()}`;
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
 
-              return unique.map((t: any) => ({
-                artist: t.artistName || '',
-                id: t.trackId?.toString() || '',
-                image: (t.artworkUrl100 || '').replace('100x100bb', '600x600bb'),
-                preview: t.previewUrl || '',
-                title: t.trackName || ''
-              }));
-            })
-            .catch(() => []);
+            if (!finalTracks.length) {
+              finalTracks = rawTracks
+                .filter(
+                  (t: any) =>
+                    t.collectionName &&
+                    t.collectionName.includes(yearStr) &&
+                    t.releaseDate &&
+                    Math.abs(new Date(t.releaseDate).getFullYear() - year) <= 1
+                )
+                .filter((t: any) => {
+                  const key = `${t.artistName?.trim().toLowerCase()}|${t.trackName?.trim().toLowerCase()}`;
+                  if (seen.has(key)) return false;
+                  seen.add(key);
+                  return true;
+                });
+            }
+
+            return finalTracks.map((t: any) => ({
+              artist: t.artistName || '',
+              id: t.trackId?.toString() || '',
+              image: (t.artworkUrl100 || '').replace('100x100bb', '600x600bb'),
+              preview: t.previewUrl || '',
+              title: t.trackName || ''
+            }));
+          });
 
           const [movies, tracks] = await Promise.all([moviesPromise, tracksPromise]);
           const limitedTracks = movies.length > 0 ? tracks.slice(0, movies.length) : tracks;

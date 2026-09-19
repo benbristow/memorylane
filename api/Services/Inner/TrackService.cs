@@ -25,47 +25,55 @@ public class TrackService : ITrackService
     {
         try
         {
-            var json = await HttpClient.GetStringAsync(
-                $"search?term={year}&entity=song&limit=200&country=gb");
+            string yearString = year.ToString();
 
-            var response = JsonConvert.DeserializeObject<ITunesSearchResponse>(json);
+            var hitsTask = HttpClient.GetStringAsync(
+                $"search?term={Uri.EscapeDataString($"{year} hits")}&entity=song&limit=200&country=gb");
+            var yearTask = HttpClient.GetStringAsync(
+                $"search?term={Uri.EscapeDataString(yearString)}&entity=song&limit=200&country=gb");
+            var topHitsTask = HttpClient.GetStringAsync(
+                $"search?term={Uri.EscapeDataString($"top hits {year}")}&entity=song&limit=200&country=gb");
 
-            if (response?.Results == null || !response.Results.Any())
+            await Task.WhenAll(hitsTask, yearTask, topHitsTask);
+
+            var allResults = new List<ITunesSongResult>();
+            foreach (var task in new[] { hitsTask, yearTask, topHitsTask })
             {
-                return Enumerable.Empty<TrackBusinessModel>();
+                var json = await task;
+                var res = JsonConvert.DeserializeObject<ITunesSearchResponse>(json);
+                if (res?.Results != null)
+                {
+                    allResults.AddRange(res.Results);
+                }
             }
 
-            var validTracks = response.Results
+            var validTracks = allResults
                 .Where(track => !string.IsNullOrEmpty(track.PreviewUrl) && !string.IsNullOrEmpty(track.ArtworkUrl100))
                 .ToList();
 
-            string yearString = year.ToString();
-
-            // Prioritize songs whose release date begins with the specified year
+            // Strictly match songs whose release date is in the specified year
             var exactYearTracks = validTracks
                 .Where(track => !string.IsNullOrEmpty(track.ReleaseDate) && track.ReleaseDate.StartsWith(yearString))
-                .ToList();
-
-            // Fallback / secondary: songs whose album/collection references the year
-            var albumYearTracks = validTracks
-                .Where(track => !exactYearTracks.Contains(track) &&
-                                !string.IsNullOrEmpty(track.CollectionName) &&
-                                track.CollectionName.Contains(yearString))
-                .ToList();
-
-            var combined = exactYearTracks
-                .Concat(albumYearTracks)
-                .GroupBy(track => track.TrackId)
+                .GroupBy(track => $"{track.ArtistName?.Trim().ToLowerInvariant()}|{track.TrackName?.Trim().ToLowerInvariant()}")
                 .Select(g => g.First())
                 .ToList();
 
-            // If still empty (e.g. vintage years), take the top results with valid audio previews
-            if (!combined.Any())
+            // Only if no exact tracks exist at all, check if collection has the year and release date is within +/- 1 year
+            var finalTracks = exactYearTracks;
+            if (!finalTracks.Any())
             {
-                combined = validTracks.Take(20).ToList();
+                finalTracks = validTracks
+                    .Where(track => !string.IsNullOrEmpty(track.CollectionName) &&
+                                    track.CollectionName.Contains(yearString) &&
+                                    !string.IsNullOrEmpty(track.ReleaseDate) &&
+                                    DateTime.TryParse(track.ReleaseDate, out var dt) &&
+                                    Math.Abs(dt.Year - year) <= 1)
+                    .GroupBy(track => $"{track.ArtistName?.Trim().ToLowerInvariant()}|{track.TrackName?.Trim().ToLowerInvariant()}")
+                    .Select(g => g.First())
+                    .ToList();
             }
 
-            return combined.Select(track => new TrackBusinessModel
+            return finalTracks.Select(track => new TrackBusinessModel
             {
                 Artist = track.ArtistName,
                 Id = track.TrackId.ToString(),
