@@ -42,6 +42,7 @@ h1 {
   .now-playing-info {
     min-width: 0;
     margin-right: 0.75rem;
+    text-align: left !important;
 
     .now-playing-title-row {
       display: flex;
@@ -49,6 +50,7 @@ h1 {
       gap: 0.45rem;
       margin-bottom: 0.15rem;
       line-height: 1.25;
+      text-align: left !important;
     }
 
     .now-playing-title {
@@ -58,6 +60,7 @@ h1 {
       line-height: 1.25;
       margin: 0;
       padding: 0;
+      text-align: left !important;
     }
 
     .now-playing-badge {
@@ -81,6 +84,9 @@ h1 {
       line-height: 1.25;
       margin: 0;
       padding: 0;
+      text-align: left !important;
+      display: block;
+      width: 100%;
     }
   }
 
