@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
-import { PulseLoader } from 'react-spinners';
 import DataStore from './stores/DataStore';
 import Header from './components/Header';
 import YearSlider from './components/YearSlider';
@@ -31,21 +30,28 @@ const App: React.FC = observer(() => {
         <div className={`joint-loader-bar ${store.loading ? 'is-loading' : ''}`}>
           <div className="joint-loader-progress" />
           <div className="joint-loader-status">
-            <PulseLoader color={'#4C9DD5'} size={6} loading={store.loading} />
+            <div className="spinner-ring" />
             <span className="joint-loader-text">
               Loading {store.year} music & movies...
             </span>
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-lg-6">
-            <MediaGrid store={store} category="tracks" />
+        <section className="media-section mb-5">
+          <div className="d-flex align-items-center mb-3 pb-2 border-bottom border-secondary">
+            <h2 className="h4 text-light mb-0">Popular Songs</h2>
+            <span className="badge bg-primary ms-2">Tracks</span>
           </div>
-          <div className="col-lg-6">
-            <MediaGrid store={store} category="movies" />
+          <MediaGrid store={store} category="tracks" />
+        </section>
+
+        <section className="media-section mb-5">
+          <div className="d-flex align-items-center mb-3 pb-2 border-bottom border-secondary">
+            <h2 className="h4 text-light mb-0">Hit Movies</h2>
+            <span className="badge bg-primary ms-2">Cinema</span>
           </div>
-        </div>
+          <MediaGrid store={store} category="movies" />
+        </section>
       </main>
     </div>
   );

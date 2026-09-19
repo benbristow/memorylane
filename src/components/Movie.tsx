@@ -7,7 +7,7 @@ interface MovieProps {
 
 const Movie: React.FC<MovieProps> = ({ data }) => {
   return (
-    <div className="col-xl-3 col-lg-6 mb-3 d-flex">
+    <div className="col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-3 d-flex">
       <article className="card media-card h-100 w-100">
         <div className="media-card-img-wrapper movie-img-wrapper">
           <img src={data.image} className="card-img-top" alt={data.title} loading="lazy" />
