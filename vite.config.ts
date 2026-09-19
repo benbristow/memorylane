@@ -112,6 +112,7 @@ function localApiDevPlugin(): Plugin {
             .catch(() => []);
 
           const [movies, tracks] = await Promise.all([moviesPromise, tracksPromise]);
+          const limitedTracks = movies.length > 0 ? tracks.slice(0, movies.length) : tracks;
 
           res.setHeader('Content-Type', 'application/json');
           res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
@@ -120,7 +121,7 @@ function localApiDevPlugin(): Plugin {
             JSON.stringify({
               meta: { criteria: { year } },
               movies,
-              tracks
+              tracks: limitedTracks
             })
           );
         } catch (err: any) {

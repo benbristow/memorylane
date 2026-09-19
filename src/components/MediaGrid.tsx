@@ -40,15 +40,20 @@ const MediaGrid: React.FC<MediaGridProps> = observer(({ store, category }) => {
   }
 
   const items = store.data[category];
+  const moviesCount = store.data.movies?.length ?? 0;
+  const displayItems =
+    category === 'tracks' && moviesCount > 0
+      ? (items as any[])?.slice(0, moviesCount)
+      : (items as any[]);
 
-  if (items && items.length > 0) {
+  if (displayItems && displayItems.length > 0) {
     return (
       <div className="row">
         {category === 'tracks'
-          ? (items as any[]).map((track) => (
+          ? displayItems.map((track) => (
               <SpotifyTrack key={track.id} store={store} data={track} />
             ))
-          : (items as any[]).map((movie) => (
+          : displayItems.map((movie) => (
               <Movie key={movie.id} data={movie} />
             ))}
       </div>
