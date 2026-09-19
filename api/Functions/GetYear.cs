@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -38,6 +38,8 @@ public class GetYear
         {
             return new BadRequestResult();
         }
+
+        req.HttpContext.Response.Headers["Cache-Control"] = "public, max-age=86400, s-maxage=86400";
 
         return new OkObjectResult(
             new YearViewModel(await _yearService.GetYear(year)));

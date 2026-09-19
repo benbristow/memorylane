@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -23,17 +23,31 @@ public class MovieService : IMovieService
 
     public async Task<IEnumerable<MovieBusinessModel>> GetMoviesForYear(int year)
     {
-        var response = JsonConvert.DeserializeObject<TheMovieDbDiscoverResponse>(await HttpClient.GetStringAsync(
-            $"discover/movie?api_key={MemoryLaneConfig.TheMovieDb.ApiKey}&primary_release_year={year}&certification_country=gb"));
+        try
+        {
+            var json = await HttpClient.GetStringAsync(
+                $"discover/movie?api_key={MemoryLaneConfig.TheMovieDb.ApiKey}&primary_release_year={year}&certification_country=gb");
 
-        return response!.Results
-            .Select(movie => new MovieBusinessModel
+            var response = JsonConvert.DeserializeObject<TheMovieDbDiscoverResponse>(json);
+
+            if (response?.Results == null)
             {
-                Date = DateTime.Parse(movie.ReleaseDate),
-                Description = movie.Overview,
-                Id = movie.Id,
-                Image = $"https://image.tmdb.org/t/p/w500{movie.PosterPath}",
-                Title = movie.Title
-            });
+                return Enumerable.Empty<MovieBusinessModel>();
+            }
+
+            return response.Results
+                .Select(movie => new MovieBusinessModel
+                {
+                    Date = DateTime.TryParse(movie.ReleaseDate, out var dt) ? dt : DateTime.MinValue,
+                    Description = movie.Overview,
+                    Id = movie.Id,
+                    Image = !string.IsNullOrEmpty(movie.PosterPath) ? $"https://image.tmdb.org/t/p/w500{movie.PosterPath}" : null,
+                    Title = movie.Title
+                });
+        }
+        catch (Exception)
+        {
+            return Enumerable.Empty<MovieBusinessModel>();
+        }
     }
 }
