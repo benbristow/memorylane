@@ -33,11 +33,13 @@ public class TrackService : ITrackService
                 $"search?term={Uri.EscapeDataString(yearString)}&entity=song&limit=200&country=gb");
             var topHitsTask = HttpClient.GetStringAsync(
                 $"search?term={Uri.EscapeDataString($"top hits {year}")}&entity=song&limit=200&country=gb");
+            var albumTask = HttpClient.GetStringAsync(
+                $"search?term={Uri.EscapeDataString($"{year} album")}&entity=song&limit=200&country=gb");
 
-            await Task.WhenAll(hitsTask, yearTask, topHitsTask);
+            await Task.WhenAll(hitsTask, yearTask, topHitsTask, albumTask);
 
             var allResults = new List<ITunesSongResult>();
-            foreach (var task in new[] { hitsTask, yearTask, topHitsTask })
+            foreach (var task in new[] { hitsTask, yearTask, topHitsTask, albumTask })
             {
                 var json = await task;
                 var res = JsonConvert.DeserializeObject<ITunesSearchResponse>(json);
@@ -47,8 +49,30 @@ public class TrackService : ITrackService
                 }
             }
 
+            // Exclude spam, ambient BGM, cafe background, tribute, and karaoke covers
+            var junkKeywords = new[]
+            {
+                "bgm", "cafe", "cafes", "cover", "karaoke", "tribute",
+                "relaxing", "lo-fi", "lofi", "instrumental", "lullaby",
+                "workout", "meditation", "sleep", "ballermann", "schützenfest", "remake"
+            };
+
+            bool IsJunk(ITunesSongResult track)
+            {
+                var artist = track.ArtistName ?? string.Empty;
+                var title = track.TrackName ?? string.Empty;
+                var collection = track.CollectionName ?? string.Empty;
+
+                return junkKeywords.Any(k =>
+                    artist.Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                    title.Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                    collection.Contains(k, StringComparison.OrdinalIgnoreCase));
+            }
+
             var validTracks = allResults
-                .Where(track => !string.IsNullOrEmpty(track.PreviewUrl) && !string.IsNullOrEmpty(track.ArtworkUrl100))
+                .Where(track => !string.IsNullOrEmpty(track.PreviewUrl) &&
+                                !string.IsNullOrEmpty(track.ArtworkUrl100) &&
+                                !IsJunk(track))
                 .ToList();
 
             // Strictly match songs whose release date is in the specified year

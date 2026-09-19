@@ -79,10 +79,26 @@ function localApiDevPlugin(): Plugin {
           const tracksPromise = Promise.all([
             fetchTracks(`${year} hits`),
             fetchTracks(year.toString()),
-            fetchTracks(`top hits ${year}`)
-          ]).then(([r1, r2, r3]) => {
-            const rawTracks = [...r1, ...r2, ...r3].filter(
-              (t: any) => t.previewUrl && t.artworkUrl100
+            fetchTracks(`top hits ${year}`),
+            fetchTracks(`${year} album`)
+          ]).then(([r1, r2, r3, r4]) => {
+            const junkKeywords = [
+              'bgm', 'cafe', 'cafes', 'cover', 'karaoke', 'tribute',
+              'relaxing', 'lo-fi', 'lofi', 'instrumental', 'lullaby',
+              'workout', 'meditation', 'sleep', 'ballermann', 'schützenfest', 'remake'
+            ];
+
+            const isJunk = (t: any) => {
+              const artist = (t.artistName || '').toLowerCase();
+              const title = (t.trackName || '').toLowerCase();
+              const collection = (t.collectionName || '').toLowerCase();
+              return junkKeywords.some(
+                (k) => artist.includes(k) || title.includes(k) || collection.includes(k)
+              );
+            };
+
+            const rawTracks = [...r1, ...r2, ...r3, ...r4].filter(
+              (t: any) => t.previewUrl && t.artworkUrl100 && !isJunk(t)
             );
             const yearStr = year.toString();
 
