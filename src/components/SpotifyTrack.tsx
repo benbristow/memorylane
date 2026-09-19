@@ -25,6 +25,7 @@ const SpotifyTrack: React.FC<SpotifyTrackProps> = ({ store, data }) => {
               store={store.playStore}
               trackId={data.id}
               mediaFile={data.preview}
+              trackData={data}
             />
           </div>
         </div>

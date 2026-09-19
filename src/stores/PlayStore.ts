@@ -1,8 +1,10 @@
 import { makeAutoObservable } from 'mobx';
 import { soundManager } from 'soundmanager2';
+import { Track } from '../types';
 
 export class PlayStore {
   trackId: string | null = null;
+  activeTrack: Track | null = null;
   sound: soundmanager.SMSound | null = null;
   playing: boolean = false;
 
@@ -10,7 +12,7 @@ export class PlayStore {
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
-  toggle(trackId: string, mediaFile?: string): void {
+  toggle(trackId: string, mediaFile?: string, trackData?: Track): void {
     const lastTrackId = this.trackId;
     this.stopSong();
 
@@ -26,6 +28,19 @@ export class PlayStore {
 
       this.playing = true;
       this.trackId = trackId;
+      this.activeTrack = trackData ?? null;
+    }
+  }
+
+  togglePause(): void {
+    if (this.sound) {
+      if (this.playing) {
+        this.sound.pause();
+        this.playing = false;
+      } else {
+        this.sound.resume();
+        this.playing = true;
+      }
     }
   }
 
@@ -35,6 +50,7 @@ export class PlayStore {
       this.sound = null;
       this.playing = false;
       this.trackId = null;
+      this.activeTrack = null;
     }
   }
 }
