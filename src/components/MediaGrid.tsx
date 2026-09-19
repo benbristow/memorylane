@@ -22,8 +22,8 @@ const MediaGrid: React.FC<MediaGridProps> = observer(({ store, category }) => {
               <div className={`skeleton-shimmer ${isTracks ? 'skeleton-image' : 'skeleton-image-movie'}`} />
               <div className="skeleton-body d-flex flex-column flex-grow-1">
                 <div className="skeleton-title skeleton-shimmer" />
-                {isTracks && <div className="skeleton-subtitle skeleton-shimmer" />}
-                {isTracks && <div className="skeleton-button skeleton-shimmer mt-auto" />}
+                <div className="skeleton-subtitle skeleton-shimmer" />
+                <div className="skeleton-button skeleton-shimmer mt-auto" />
               </div>
             </div>
           </div>
