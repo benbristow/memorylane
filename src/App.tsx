@@ -28,17 +28,15 @@ const App: React.FC = observer(() => {
         <Header store={store} />
         <YearSlider store={store} />
 
-        {store.loading && (
-          <div className="full-page-loader-overlay" role="dialog" aria-modal="true" aria-label="Loading">
-            <div className="full-page-loader-content">
-              <div className="loader-spinner">
-                <PulseLoader color={'#4C9DD5'} size={14} loading />
-              </div>
-              <h2 className="loader-title">Loading Memory Lane</h2>
-              <p className="loader-subtitle">Gathering songs and movies from {store.year}...</p>
-            </div>
+        <div className={`joint-loader-bar ${store.loading ? 'is-loading' : ''}`}>
+          <div className="joint-loader-progress" />
+          <div className="joint-loader-status">
+            <PulseLoader color={'#4C9DD5'} size={6} loading={store.loading} />
+            <span className="joint-loader-text">
+              Loading {store.year} music & movies...
+            </span>
           </div>
-        )}
+        </div>
 
         <div className="row">
           <div className="col-lg-6">
